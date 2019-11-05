@@ -1,7 +1,6 @@
 package com.appsdeveloperblog.photoapp.api.users.ui.controller;
 
 import com.appsdeveloperblog.photoapp.api.users.ui.dto.UserDTO;
-import com.appsdeveloperblog.photoapp.api.users.ui.entity.UserEntity;
 import com.appsdeveloperblog.photoapp.api.users.ui.model.CreateUserRequestModel;
 import com.appsdeveloperblog.photoapp.api.users.ui.model.CreateUserResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.ui.service.UsersService;
@@ -14,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.Media;
 
 @RestController
 @RequestMapping("/users")
