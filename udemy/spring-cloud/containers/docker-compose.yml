@@ -1,0 +1,15 @@
+version: '3'
+services:
+    mysql:
+      environment:
+        MYSQL_ROOT_PASSWORD: udemy
+        MYSQL_ROOT_HOST: '%'
+        MYSQL_DATABASE: 'udemy'
+        MYSQL_PASSWORD: udemy
+        MYSQL_USER: udemy 
+      restart: always
+      image:  mysql/mysql-server:5.7
+      container_name: mysql-udemy
+      command: mysqld --user=root
+      ports:
+        - 3306:3306
