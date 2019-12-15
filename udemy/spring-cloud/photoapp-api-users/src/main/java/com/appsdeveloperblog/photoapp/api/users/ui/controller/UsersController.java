@@ -3,6 +3,7 @@ package com.appsdeveloperblog.photoapp.api.users.ui.controller;
 import com.appsdeveloperblog.photoapp.api.users.ui.dto.UserDTO;
 import com.appsdeveloperblog.photoapp.api.users.ui.model.CreateUserRequestModel;
 import com.appsdeveloperblog.photoapp.api.users.ui.model.CreateUserResponseModel;
+import com.appsdeveloperblog.photoapp.api.users.ui.model.UserResponseModel;
 import com.appsdeveloperblog.photoapp.api.users.ui.service.UsersService;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -44,6 +45,16 @@ public class UsersController {
 		CreateUserResponseModel createUserResponseModel = modelMapper.map(createdUser, CreateUserResponseModel.class);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(createUserResponseModel);
+	}
+
+
+	@GetMapping(
+			value = "/{userId}",
+			produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+	) public ResponseEntity<UserResponseModel> getUser(@PathVariable("userId") String userId) {
+		UserDTO userDTO = usersService.getUserById(userId);
+		UserResponseModel returnValue = modelMapper.map(userDTO, UserResponseModel.class);
+		return ResponseEntity.status(HttpStatus.OK).body(returnValue);
 	}
 
 }
