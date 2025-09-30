@@ -1,0 +1,6 @@
+Key Takeaways
+    @Builder(toBuilder = true) enables modification of immutable objects
+    @AllArgsConstructor(staticName = “of”) provides clean factory methods
+    @Builder.Default sets default values for optional fields
+    @Setter on specific fields allows mutation where needed
+    Mixed patterns provide maximum flexibility for object creation
