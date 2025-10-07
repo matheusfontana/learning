@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    active: local
+  application:
+    name: codestandards
+    banner:
+      location: classpath:banner.txt
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+  datasource:
+    testOnBorrow: true
+    validationQuery: SELECT 1
