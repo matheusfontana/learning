@@ -1,0 +1,180 @@
+buildscript {
+	ext {
+		springBootVersion = '3.4.6'
+		springSecurityVersion = '6.4.2'
+		lombokVersion = '1.18.36'
+		springDocVersion = '2.7.0'
+		modelMapperVersion = '3.2.1'
+		openFeignVersion = '4.2.0'
+		mysqlConnectorVersion = '8.4.0'
+		jacocoVersion = '0.8.12'
+		checkstyleVersion = '10.20.1'
+		pmdVersion = '7.8.0'
+		commonsLang = '3.18.0'
+
+	}
+	ext['spring-webmvc.version'] = '6.2.10'
+}
+
+plugins {
+	id 'org.springframework.boot' version '3.4.6'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'java'
+	id 'checkstyle'
+	id 'pmd'
+	id 'jacoco'
+}
+
+group = 'com.acme'
+version = System.getenv('IMAGE_TAG') ?: 'local'
+
+java {
+	sourceCompatibility = '21'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+	implementation "org.springframework.cloud:spring-cloud-starter-openfeign:${openFeignVersion}"
+	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
+	implementation "org.modelmapper:modelmapper:${modelMapperVersion}"
+
+	implementation "org.apache.commons:commons-lang3:${commonsLang}"
+
+	compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+	runtimeOnly "com.mysql:mysql-connector-j:${mysqlConnectorVersion}"
+
+	testImplementation "org.springframework.boot:spring-boot-starter-test:${springBootVersion}"
+	testImplementation "org.springframework.security:spring-security-test:${springSecurityVersion}"
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+
+	all {
+		exclude group: 'commons-io', module: 'commons-io'
+	}
+}
+
+springBoot {
+	buildInfo {
+		properties {
+			additional = [
+					'version'     : version,
+					'java.version': JavaVersion.current(),
+			]
+		}
+	}
+}
+
+jar {
+	enabled = false
+	archiveClassifier = ''
+}
+
+bootJar {
+	enabled = true
+	archiveClassifier = ''
+	manifest {
+		attributes(
+				'Implementation-Title': rootProject.name,
+				'Implementation-Version': version
+		)
+	}
+}
+
+test {
+	useJUnitPlatform()
+	dependsOn tasks.pmdMain
+
+	testLogging {
+		events "passed", "skipped", "failed"
+		showStandardStreams = true
+	}
+}
+
+jacoco {
+	toolVersion = jacocoVersion
+	reportsDirectory = layout.buildDirectory.dir('reports')
+}
+
+jacocoTestReport {
+	afterEvaluate {
+		classDirectories = files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					])
+		})
+	}
+}
+
+jacocoTestCoverageVerification {
+	dependsOn(tasks.checkstyleMain, tasks.pmdMain, tasks.test)
+	violationRules {
+		rule {
+			element = 'CLASS'
+			excludes = []
+			limit {
+				counter = 'INSTRUCTION'
+				minimum = 1.0
+			}
+			limit {
+				counter = 'LINE'
+				minimum = 1.0
+			}
+			limit {
+				counter = 'BRANCH'
+				minimum = 1.0
+			}
+			limit {
+				counter = 'COMPLEXITY'
+				minimum = 1.0
+			}
+			limit {
+				counter = 'METHOD'
+				minimum = 1.0
+			}
+			limit {
+				counter = 'CLASS'
+				minimum = 1.0
+			}
+		}
+	}
+}
+
+checkstyle {
+	toolVersion = checkstyleVersion
+	configFile = file('config/checkstyle/checkstyle.xml')
+	sourceSets = [sourceSets.main, sourceSets.test]
+	maxWarnings = 0
+	configProperties = [
+			'configDir': file('config/checkstyle'),
+			'baseDir'  : projectDir,
+	]
+	showViolations = true
+	ignoreFailures = false
+}
+
+pmd {
+	toolVersion = pmdVersion
+	ignoreFailures = false
+	ruleSetFiles = files('config/pmd/pmd.xml')
+	sourceSets = [sourceSets.main]
+}
+
+pmdMain {
+	dependsOn tasks.checkstyleMain
+}
+
+checkstyleMain {
+}
